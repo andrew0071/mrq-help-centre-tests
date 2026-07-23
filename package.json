@@ -1,0 +1,40 @@
+{
+  "name": "mrq-test-automation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  "test": "cucumber-js",
+  "test:registration": "cucumber-js --tags \"@registration\"",
+  "test:smoke": "cucumber-js --tags \"@smoke\"",
+
+  "test:headed": "cross-env HEADLESS=false cucumber-js",
+  "test:headless": "cross-env HEADLESS=true cucumber-js",
+
+  "test:chrome": "cross-env BROWSER=chromium cucumber-js",
+  "test:firefox": "cross-env BROWSER=firefox cucumber-js",
+  "test:webkit": "cross-env BROWSER=webkit cucumber-js",
+
+  "test:browserstack": "cross-env TEST_ENV=browserstack cucumber-js",
+  "test:browserstack:smoke": "cross-env TEST_ENV=browserstack cucumber-js --tags \"@smoke\"",
+  "test:browserstack:registration": "cross-env TEST_ENV=browserstack cucumber-js --tags \"@registration\"",
+
+  "typecheck": "tsc --noEmit"
+},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@cucumber/cucumber": "^13.2.0",
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2",
+    "eslint": "^10.7.0",
+    "playwright": "^1.61.1",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2"
+  }
+}
