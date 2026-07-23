@@ -4,7 +4,7 @@
   "description": "MrQ Help Centre Playwright + Cucumber tests",
   "type": "commonjs",
   "scripts": {
-    "test": "cucumber-js",
+     "test": "cucumber-js --format pretty",
     "test:smoke": "cucumber-js --tags \"@smoke\"",
     "test:headed": "cross-env HEADLESS=false cucumber-js",
     "test:headless": "cross-env HEADLESS=true cucumber-js",

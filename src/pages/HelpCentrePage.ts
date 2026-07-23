@@ -73,8 +73,6 @@ export class HelpCentrePage {
 
       expect(href,`Navigation link "${linkText}" should contain a section hash`).toMatch(/^#/);
 
-      console.log(`Checking navigation link ${index + 1}/${linkCount}: ${linkText}`);
-
       await link.scrollIntoViewIfNeeded();
       await link.click();
 
