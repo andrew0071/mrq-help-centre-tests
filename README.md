@@ -1,123 +1,175 @@
-# Installation
+# MrQ Help Centre Test Automation
+
+Automated UI tests for the MrQ Help Centre using **Playwright**, **Cucumber.js** and **TypeScript**.
+
+---
+
+## Technology Stack
+
+- Playwright
+- Cucumber.js
+- TypeScript
+- GitHub Actions
+- Node.js
+
+---
+
+## Project Structure
+
+```text
+.
+├── .github
+│   └── workflows
+├── features
+│   ├── help-centre-search.feature
+│   ├── help-centre-navigation.feature
+│   └── step-definitions
+│       └── help-centre.steps.ts
+├── src
+│   ├── helpers
+│   │   └── stringHelper.ts
+│   ├── hooks
+│   │   └── hooks.ts
+│   ├── pages
+│   │   └── HelpCentrePage.ts
+│   └── support
+│       └── CustomWorld.ts
+├── .env.example
+├── package.json
+└── README.md
+```
+
+---
+
+## Design Decisions
+
+The framework follows the **Page Object Model (POM)** to separate test logic from page interactions.
+
+The current covers a single cohesive Help Centre experience, therefore a single `HelpCentrePage` object is used to encapsulate page interactions, selectors and assertions as the pages are the same but with different content. As the application grows, this could naturally be separated into dedicated page objects such as `HomePage`, `CategoryPage` and `ArticlePage`.
+
+The test scenarios are organised into two feature files:
+
+- **Help Centre Search**
+- **Help Centre Navigation**
+
+A single step definition file is used as all scenarios belong to the same functional area. This keeps related behaviour together and avoids duplicate step definitions.
+
+Assertions are encapsulated within the page object, allowing the step definitions to remain concise and focused on business behaviour.
+
+---
+
+## Prerequisites
+
+- Node.js 22 or later
+- npm
+
+---
+
+## Installation
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/andrew0071/mrq-playwright-framework.git
-cd mrq-playwright-framework
+git clone <repository-url>
+cd mrq-help-centre-tests
 ```
 
-Install dependencies:
+Install project dependencies:
 
 ```bash
 npm install
 ```
 
----
-
-# Configuration
-
-Create a `.env` file in the project root (or copy `.env.example`):
-
-```text
-BROWSERSTACK_USERNAME=your_username
-BROWSERSTACK_ACCESS_KEY=your_access_key
-TEST_ENV=local
-HEADLESS=true
-```
-
----
-
-# Running Tests
-
-## Run locally
-
-Execute the registration journey locally using Playwright:
+Install Playwright browsers:
 
 ```bash
-npm run test:registration
+npx playwright install
 ```
 
 ---
 
-## Run against BrowserStack
+## Environment Variables
 
-Execute the same test remotely on BrowserStack:
+Create a `.env` file in the project root.
+
+Example:
+
+```env
+BASE_URL=https://help.mrq.com/en/
+HEADLESS=false
+BROWSER=chromium
+```
+
+Alternatively, copy the provided example:
 
 ```bash
-npm run test:browserstack
+cp .env.example .env
 ```
 
 ---
 
-## Tagged execution
+## Running the Tests
 
-Run only the registration tests:
+Run all tests:
 
 ```bash
-npm run test:browserstack:registration
+npm test
 ```
 
-Run the smoke suite:
+Run in headed mode:
 
 ```bash
-npm run test:browserstack:smoke
+HEADLESS=false npm test
+```
+
+Run in headless mode:
+
+```bash
+HEADLESS=true npm test
+```
+
+Run the TypeScript compiler:
+
+```bash
+npx tsc --noEmit
 ```
 
 ---
 
-# Test Reports
+## Test Coverage
 
-After execution, an HTML report is generated containing:
+Current automated scenarios include:
 
-- Scenario results
-- Execution time
-- Embedded screenshots
-- Step-by-step execution details
-
----
-
-# Project Structure
-
-```
-config/
-features/
-src/
-├── hooks/
-├── pages/
-├── step-definitions/
-├── support/
-└── utils/
-```
+- Search for a Help Centre article
+- Open an article from search results
+- Verify article headings
+- Verify expected article sections
+- Verify article navigation links scroll to the correct section
+- Browse articles using category navigation
 
 ---
 
-# Framework Design
+## GitHub Actions
 
-The framework has been built using modern automation design principles:
+A GitHub Actions workflow is included to allow the test suite to be executed manually using **workflow_dispatch**.
 
-- Playwright + TypeScript
-- Cucumber (BDD)
-- Page Object Model
-- Browser Factory pattern
-- BrowserStack integration
-- Randomised test data
-- Stable locator strategy (`data-test-id` where available)
-- Thin step definitions
-- HTML reporting with screenshots
+The workflow:
+
+- Checks out the repository
+- Installs Node.js dependencies
+- Installs Playwright browsers
+- Runs the TypeScript compilation
+- Executes the Cucumber test suite
 
 ---
 
-# Current Automated Journey
+## Future Improvements
 
-The current automation covers the MrQ registration journey:
+Potential future enhancements include:
 
-1. Open homepage
-2. Click **Join Now**
-3. Complete Account Details
-4. Complete Personal Details
-5. Reach the final confirmation page
-6. Select required checkboxes
-7. Verify the **Complete Signup** button becomes enabled
-
-The test deliberately **does not click Complete Signup**, ensuring no account is created.
+- Cross-browser execution
+- Parallel test execution
+- HTML reporting
+- Screenshot and video capture on failure
+- Additional page objects as application complexity increases
+- API integration tests

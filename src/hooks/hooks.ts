@@ -1,126 +1,59 @@
+import "dotenv/config";
+
 import {
   After,
   Before,
-  setDefaultTimeout,
-  Status
+  setDefaultTimeout
 } from "@cucumber/cucumber";
 
-import { createBrowserSession } from "../support/browserFactory";
+import {
+  chromium,
+  firefox,
+  webkit
+} from "playwright";
+
 import { CustomWorld } from "../support/CustomWorld";
 
 setDefaultTimeout(30_000);
 
-Before(
-  {
-    timeout: 60_000
-  },
-  async function (
-    this: CustomWorld,
-    scenario
-  ): Promise<void> {
-    this.scenarioName = scenario.pickle.name;
+Before(async function (
+  this: CustomWorld
+): Promise<void> {
+  const browserName = (
+    process.env.BROWSER ?? "chromium"
+  ).toLowerCase();
 
-    const session = await createBrowserSession();
+  const headless =
+    process.env.HEADLESS !== "false";
 
-    this.browser = session.browser;
-    this.context = session.context;
-    this.isBrowserStackSession = session.isBrowserStack;
-    this.page = await session.context.newPage();
+  const browserType =
+    browserName === "firefox"
+      ? firefox
+      : browserName === "webkit"
+        ? webkit
+        : chromium;
 
-    this.page.setDefaultTimeout(15_000);
-    this.page.setDefaultNavigationTimeout(30_000);
+  this.browser = await browserType.launch({
+    headless
+  });
 
-    this.accountCreationRequestDetected = false;
+  this.context = await this.browser.newContext({
+    viewport: {
+      width: 1440,
+      height: 900
+    },
+    locale: "en-GB"
+  });
 
-    this.page.on("request", request => {
-      const method = request.method().toUpperCase();
-      const url = request.url().toLowerCase();
+  this.page = await this.context.newPage();
 
-      const looksLikeAccountCreation =
-        method === "POST" &&
-        (
-          url.includes("register") ||
-          url.includes("registration") ||
-          url.includes("signup") ||
-          url.includes("sign-up") ||
-          url.includes("account")
-        );
+  this.page.setDefaultTimeout(15_000);
+  this.page.setDefaultNavigationTimeout(30_000);
+});
 
-      if (looksLikeAccountCreation) {
-        this.accountCreationRequestDetected = true;
-      }
-    });
-  }
-);
-
-After(
-  {
-    timeout: 60_000
-  },
-  async function (
-    this: CustomWorld,
-    scenario
-  ): Promise<void> {
-    try {
-      if (this.page) {
-        const screenshot = await this.page.screenshot({
-          fullPage: true
-        });
-
-        await this.attach(screenshot, "image/png");
-      }
-
-      if (
-        this.isBrowserStackSession &&
-        this.page
-      ) {
-        const passed =
-          scenario.result?.status === Status.PASSED;
-
-        const status = passed
-          ? "passed"
-          : "failed";
-
-        const reason = passed
-          ? "Cucumber scenario passed"
-          : scenario.result?.message ??
-            "Cucumber scenario failed";
-
-        console.log(
-          `Marking BrowserStack session as ${status}`
-        );
-
-        const response = await this.page.evaluate(
-          _ => {},
-          `browserstack_executor: ${JSON.stringify({
-            action: "setSessionStatus",
-            arguments: {
-              status,
-              reason
-            }
-          })}`
-        );
-
-        console.log(
-          "BrowserStack status response:",
-          response
-        );
-      }
-    } catch (error) {
-      console.error(
-        "BrowserStack After hook failed:",
-        error
-      );
-
-      throw error;
-    } finally {
-      console.log("Closing browser context");
-      await this.context?.close();
-
-      console.log("Closing browser");
-      await this.browser?.close();
-
-      console.log("BrowserStack cleanup completed");
-    }
-  }
-);
+After(async function (
+  this: CustomWorld
+): Promise<void> {
+  await this.context?.close();
+  await this.browser?.close();
+});

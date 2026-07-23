@@ -15,10 +15,6 @@ export class CustomWorld extends World {
   context?: BrowserContext;
   page?: Page;
 
-  scenarioName = "";
-  isBrowserStackSession = false;
-  accountCreationRequestDetected = false;
-
   constructor(options: IWorldOptions) {
     super(options);
   }
